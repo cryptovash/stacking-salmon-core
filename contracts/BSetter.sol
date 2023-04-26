@@ -1,4 +1,4 @@
-pragma solidity =0.5.16;
+pragma solidity 0.5.17;
 
 import "./BStorage.sol";
 import "./PoolToken.sol";
@@ -23,7 +23,7 @@ contract BSetter is PoolToken, BStorage {
         address _underlying,
         address _collateral
     ) external {
-        require(msg.sender == factory, "Stacking Salmon: UNAUTHORIZED"); // sufficient check
+        require(msg.sender == factory, "StackingSalmon: UNAUTHORIZED"); // sufficient check
         _setName(_name, _symbol);
         underlying = _underlying;
         collateral = _collateral;
@@ -36,10 +36,7 @@ contract BSetter is PoolToken, BStorage {
         emit NewReserveFactor(newReserveFactor);
     }
 
-    function _setKinkUtilizationRate(uint256 newKinkUtilizationRate)
-        external
-        nonReentrant
-    {
+    function _setKinkUtilizationRate(uint256 newKinkUtilizationRate) external nonReentrant {
         _checkSetting(newKinkUtilizationRate, KINK_UR_MIN, KINK_UR_MAX);
         kinkUtilizationRate = newKinkUtilizationRate;
         emit NewKinkUtilizationRate(newKinkUtilizationRate);
@@ -63,11 +60,11 @@ contract BSetter is PoolToken, BStorage {
         uint256 max
     ) internal view {
         _checkAdmin();
-        require(parameter >= min, "Stacking Salmon: INVALID_SETTING");
-        require(parameter <= max, "Stacking Salmon: INVALID_SETTING");
+        require(parameter >= min, "StackingSalmon: INVALID_SETTING");
+        require(parameter <= max, "StackingSalmon: INVALID_SETTING");
     }
 
     function _checkAdmin() internal view {
-        require(msg.sender == IFactory(factory).admin(), "Stacking Salmon: UNAUTHORIZED");
+        require(msg.sender == IFactory(factory).admin(), "StackingSalmon: UNAUTHORIZED");
     }
 }

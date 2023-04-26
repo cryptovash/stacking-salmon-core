@@ -1,4 +1,4 @@
-pragma solidity =0.5.16;
+pragma solidity 0.5.17;
 
 contract BStorage {
     address public collateral;
@@ -29,7 +29,7 @@ contract BStorage {
     address public borrowTracker;
 
     function safe112(uint256 n) internal pure returns (uint112) {
-        require(n < 2**112, "Stacking Salmon: SAFE112");
+        require(n < 2**112, "StackingSalmon: SAFE112");
         return uint112(n);
     }
 }

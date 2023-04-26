@@ -9,6 +9,6 @@ Many design choices used in the Stacking Salmon Protocol stem from Impermax and 
 
 ## Contracts on Berachain 
 
-- **BDeployer:**
-- **CDeployer:**
-- **Factory:**
+- **BDeployer:** ['0x0AeD4527D804A6fab3CBeEDe878BD89cBD226ee3'](https://testnet.ftmscan.com/address/0x0AeD4527D804A6fab3CBeEDe878BD89cBD226ee3#code)
+- **CDeployer:** ['0x824f42dA6FB1b3f7F513b37cA50D4e51dbbF9b4d'](https://testnet.ftmscan.com/address/0x824f42dA6FB1b3f7F513b37cA50D4e51dbbF9b4d#code)
+- **Factory:** ['0xa5dBcA147CafC78789c3aA64E433e6981bAA2057'](https://testnet.ftmscan.com/address/0xa5dBcA147CafC78789c3aA64E433e6981bAA2057#code)

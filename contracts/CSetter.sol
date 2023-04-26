@@ -1,4 +1,4 @@
-pragma solidity =0.5.16;
+pragma solidity 0.5.17;
 
 import "./CStorage.sol";
 import "./PoolToken.sol";
@@ -22,7 +22,7 @@ contract CSetter is PoolToken, CStorage {
         address _borrowable0,
         address _borrowable1
     ) external {
-        require(msg.sender == factory, "Stacking Salmon: UNAUTHORIZED"); // sufficient check
+        require(msg.sender == factory, "StackingSalmon: UNAUTHORIZED"); // sufficient check
         _setName(_name, _symbol);
         underlying = _underlying;
         borrowable0 = _borrowable0;
@@ -30,28 +30,14 @@ contract CSetter is PoolToken, CStorage {
         stackingSalmonPriceOracle = IFactory(factory).stackingSalmonPriceOracle();
     }
 
-    function _setSafetyMarginSqrt(uint256 newSafetyMarginSqrt)
-        external
-        nonReentrant
-    {
-        _checkSetting(
-            newSafetyMarginSqrt,
-            SAFETY_MARGIN_SQRT_MIN,
-            SAFETY_MARGIN_SQRT_MAX
-        );
+    function _setSafetyMarginSqrt(uint256 newSafetyMarginSqrt) external nonReentrant {
+        _checkSetting(newSafetyMarginSqrt, SAFETY_MARGIN_SQRT_MIN, SAFETY_MARGIN_SQRT_MAX);
         safetyMarginSqrt = newSafetyMarginSqrt;
         emit NewSafetyMargin(newSafetyMarginSqrt);
     }
 
-    function _setLiquidationIncentive(uint256 newLiquidationIncentive)
-        external
-        nonReentrant
-    {
-        _checkSetting(
-            newLiquidationIncentive,
-            LIQUIDATION_INCENTIVE_MIN,
-            LIQUIDATION_INCENTIVE_MAX
-        );
+    function _setLiquidationIncentive(uint256 newLiquidationIncentive) external nonReentrant {
+        _checkSetting(newLiquidationIncentive, LIQUIDATION_INCENTIVE_MIN, LIQUIDATION_INCENTIVE_MAX);
         liquidationIncentive = newLiquidationIncentive;
         emit NewLiquidationIncentive(newLiquidationIncentive);
     }
@@ -62,11 +48,11 @@ contract CSetter is PoolToken, CStorage {
         uint256 max
     ) internal view {
         _checkAdmin();
-        require(parameter >= min, "Stacking Salmon: INVALID_SETTING");
-        require(parameter <= max, "Stacking Salmon: INVALID_SETTING");
+        require(parameter >= min, "StackingSalmon: INVALID_SETTING");
+        require(parameter <= max, "StackingSalmon: INVALID_SETTING");
     }
 
     function _checkAdmin() internal view {
-        require(msg.sender == IFactory(factory).admin(), "Stacking Salmon: UNAUTHORIZED");
+        require(msg.sender == IFactory(factory).admin(), "StackingSalmon: UNAUTHORIZED");
     }
 }

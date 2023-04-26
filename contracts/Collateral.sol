@@ -1,4 +1,4 @@
-pragma solidity =0.5.16;
+pragma solidity 0.5.17;
 
 import "./PoolToken.sol";
 import "./CStorage.sol";
@@ -21,23 +21,16 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
 
     // returns the prices of borrowable0's and borrowable1's underlyings with collateral's underlying as denom
     function getPrices() public returns (uint256 price0, uint256 price1) {
-        (uint224 twapPrice112x112, ) =
-            IStackingSalmonPriceOracle(stackingSalmonPriceOracle).getResult(underlying);
-        (uint112 reserve0, uint112 reserve1, ) =
-            IUniswapV2Pair(underlying).getReserves();
-        uint256 collateralTotalSupply =
-            IUniswapV2Pair(underlying).totalSupply();
+        (uint224 twapPrice112x112, ) = IStackingSalmonPriceOracle(stackingSalmonPriceOracle).getResult(underlying);
+        (uint112 reserve0, uint112 reserve1, ) = IUniswapV2Pair(underlying).getReserves();
+        uint256 collateralTotalSupply = IUniswapV2Pair(underlying).totalSupply();
 
-        uint224 currentPrice112x112 =
-            UQ112x112.encode(reserve1).uqdiv(reserve0);
-        uint256 adjustmentSquared =
-            uint256(twapPrice112x112).mul(2**32).div(currentPrice112x112);
+        uint224 currentPrice112x112 = UQ112x112.encode(reserve1).uqdiv(reserve0);
+        uint256 adjustmentSquared = uint256(twapPrice112x112).mul(2**32).div(currentPrice112x112);
         uint256 adjustment = Math.sqrt(adjustmentSquared.mul(2**32));
 
-        uint256 currentBorrowable0Price =
-            uint256(collateralTotalSupply).mul(1e18).div(reserve0 * 2);
-        uint256 currentBorrowable1Price =
-            uint256(collateralTotalSupply).mul(1e18).div(reserve1 * 2);
+        uint256 currentBorrowable0Price = uint256(collateralTotalSupply).mul(1e18).div(reserve0 * 2);
+        uint256 currentBorrowable1Price = uint256(collateralTotalSupply).mul(1e18).div(reserve1 * 2);
 
         price0 = currentBorrowable0Price.mul(adjustment).div(2**32);
         price1 = currentBorrowable1Price.mul(2**32).div(adjustment);
@@ -47,8 +40,8 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
          * reserve0 / reserve1 is close to 2**112 or 1/2**112
          * We're going to prevent users from using pairs at risk from the UI
          */
-        require(price0 > 100, "Stacking Salmon: PRICE_CALCULATION_ERROR");
-        require(price1 > 100, "Stacking Salmon: PRICE_CALCULATION_ERROR");
+        require(price0 > 100, "StackingSalmon: PRICE_CALCULATION_ERROR");
+        require(price1 > 100, "StackingSalmon: PRICE_CALCULATION_ERROR");
     }
 
     // returns liquidity in  collateral's underlying
@@ -81,7 +74,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address to,
         uint256 value
     ) internal {
-        require(tokensUnlocked(from, value), "Stacking Salmon: INSUFFICIENT_LIQUIDITY");
+        require(tokensUnlocked(from, value), "StackingSalmon: INSUFFICIENT_LIQUIDITY");
         super._transfer(from, to, value);
     }
 
@@ -92,8 +85,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         uint256 amountCollateral = finalBalance.mul(exchangeRate()).div(1e18);
         uint256 amount0 = IBorrowable(borrowable0).borrowBalance(from);
         uint256 amount1 = IBorrowable(borrowable1).borrowBalance(from);
-        (, uint256 shortfall) =
-            _calculateLiquidity(amountCollateral, amount0, amount1);
+        (, uint256 shortfall) = _calculateLiquidity(amountCollateral, amount0, amount1);
         return shortfall == 0;
     }
 
@@ -104,19 +96,13 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         uint256 amount0,
         uint256 amount1
     ) public returns (uint256 liquidity, uint256 shortfall) {
-        if (amount0 == uint256(-1))
-            amount0 = IBorrowable(borrowable0).borrowBalance(borrower);
-        if (amount1 == uint256(-1))
-            amount1 = IBorrowable(borrowable1).borrowBalance(borrower);
-        uint256 amountCollateral =
-            balanceOf[borrower].mul(exchangeRate()).div(1e18);
+        if (amount0 == uint256(-1)) amount0 = IBorrowable(borrowable0).borrowBalance(borrower);
+        if (amount1 == uint256(-1)) amount1 = IBorrowable(borrowable1).borrowBalance(borrower);
+        uint256 amountCollateral = balanceOf[borrower].mul(exchangeRate()).div(1e18);
         return _calculateLiquidity(amountCollateral, amount0, amount1);
     }
 
-    function accountLiquidity(address borrower)
-        public
-        returns (uint256 liquidity, uint256 shortfall)
-    {
+    function accountLiquidity(address borrower) public returns (uint256 liquidity, uint256 shortfall) {
         return accountLiquidityAmounts(borrower, uint256(-1), uint256(-1));
     }
 
@@ -127,16 +113,10 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
     ) public returns (bool) {
         address _borrowable0 = borrowable0;
         address _borrowable1 = borrowable1;
-        require(
-            borrowable == _borrowable0 || borrowable == _borrowable1,
-            "Stacking Salmon: INVALID_BORROWABLE"
-        );
-        uint256 amount0 =
-            borrowable == _borrowable0 ? accountBorrows : uint256(-1);
-        uint256 amount1 =
-            borrowable == _borrowable1 ? accountBorrows : uint256(-1);
-        (, uint256 shortfall) =
-            accountLiquidityAmounts(borrower, amount0, amount1);
+        require(borrowable == _borrowable0 || borrowable == _borrowable1, "StackingSalmon: INVALID_BORROWABLE");
+        uint256 amount0 = borrowable == _borrowable0 ? accountBorrows : uint256(-1);
+        uint256 amount1 = borrowable == _borrowable1 ? accountBorrows : uint256(-1);
+        (, uint256 shortfall) = accountLiquidityAmounts(borrower, amount0, amount1);
         return shortfall == 0;
     }
 
@@ -146,28 +126,18 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address borrower,
         uint256 repayAmount
     ) external returns (uint256 seizeTokens) {
-        require(
-            msg.sender == borrowable0 || msg.sender == borrowable1,
-            "Stacking Salmon: UNAUTHORIZED"
-        );
+        require(msg.sender == borrowable0 || msg.sender == borrowable1, "StackingSalmon: UNAUTHORIZED");
 
         (, uint256 shortfall) = accountLiquidity(borrower);
-        require(shortfall > 0, "Stacking Salmon: INSUFFICIENT_SHORTFALL");
+        require(shortfall > 0, "StackingSalmon: INSUFFICIENT_SHORTFALL");
 
         uint256 price;
         if (msg.sender == borrowable0) (price, ) = getPrices();
         else (, price) = getPrices();
 
-        seizeTokens = repayAmount
-            .mul(liquidationIncentive)
-            .div(1e18)
-            .mul(price)
-            .div(exchangeRate());
+        seizeTokens = repayAmount.mul(liquidationIncentive).div(1e18).mul(price).div(exchangeRate());
 
-        balanceOf[borrower] = balanceOf[borrower].sub(
-            seizeTokens,
-            "Stacking Salmon: LIQUIDATING_TOO_MUCH"
-        );
+        balanceOf[borrower] = balanceOf[borrower].sub(seizeTokens, "StackingSalmon: LIQUIDATING_TOO_MUCH");
         balanceOf[liquidator] = balanceOf[liquidator].add(seizeTokens);
         emit Transfer(borrower, liquidator, seizeTokens);
     }
@@ -178,20 +148,15 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         uint256 redeemAmount,
         bytes calldata data
     ) external nonReentrant update {
-        require(redeemAmount <= totalBalance, "Stacking Salmon: INSUFFICIENT_CASH");
+        require(redeemAmount <= totalBalance, "StackingSalmon: INSUFFICIENT_CASH");
 
         // optimistically transfer funds
         _safeTransfer(redeemer, redeemAmount);
-        if (data.length > 0)
-            IStackingSalmonCallee(redeemer).stackingSalmonRedeem(msg.sender, redeemAmount, data);
+        if (data.length > 0) IStackingSalmonCallee(redeemer).stackingSalmonRedeem(msg.sender, redeemAmount, data);
 
         uint256 redeemTokens = balanceOf[address(this)];
-        uint256 declaredRedeemTokens =
-            redeemAmount.mul(1e18).div(exchangeRate()).add(1); // rounded up
-        require(
-            redeemTokens >= declaredRedeemTokens,
-            "Stacking Salmon: INSUFFICIENT_REDEEM_TOKENS"
-        );
+        uint256 declaredRedeemTokens = redeemAmount.mul(1e18).div(exchangeRate()).add(1); // rounded up
+        require(redeemTokens >= declaredRedeemTokens, "StackingSalmon: INSUFFICIENT_REDEEM_TOKENS");
 
         _burn(address(this), redeemTokens);
         emit Redeem(msg.sender, redeemer, redeemAmount, redeemTokens);
