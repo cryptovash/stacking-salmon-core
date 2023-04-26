@@ -7,7 +7,7 @@ Many design choices used in the Stacking Salmon Protocol stem from Impermax and 
 - [Impermax x Uniswap V2 Whitepaper](https://impermax.finance/Whitepaper-Impermax-UniswapV2.pdf 'Impermax x Uniswap V2 Whitepaper'): this document explains the scope and the components of Impermax from a high level perspective.
 - [UniswapV2 Whitepaper](https://uniswap.org/whitepaper.pdf 'UniswapV2 Whitepaper'): this document explains some design choices made while implementing UniswapV2.
 
-## Contracts on Berachain 
+## Contracts on Fantom Testnet
 
 - **BDeployer:** [0x0AeD4527D804A6fab3CBeEDe878BD89cBD226ee3](https://testnet.ftmscan.com/address/0x0AeD4527D804A6fab3CBeEDe878BD89cBD226ee3#code)
 - **CDeployer:** [0x824f42dA6FB1b3f7F513b37cA50D4e51dbbF9b4d](https://testnet.ftmscan.com/address/0x824f42dA6FB1b3f7F513b37cA50D4e51dbbF9b4d#code)
